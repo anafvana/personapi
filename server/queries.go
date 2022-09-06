@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 )
 
 type Person struct {
-	UserId    int    `json:"brukerid,omitempty"`
+	UserId    *int   `json:"brukerid,omitempty"`
 	Fornavn   string `json:"fornavn"`
 	Etternavn string `json:"etternavn"`
 }
@@ -35,7 +36,7 @@ func (r repo) GetPerson(ctx *gin.Context) {
 	}
 
 	var person Person
-	row := r.db.QueryRow(`SELECT * FROM Persons WHERE userid = $1`, id)
+	row := r.db.QueryRow(`SELECT * FROM Persons WHERE bruker_id = $1`, id)
 	if err := row.Scan(
 		&person.UserId,
 		&person.Fornavn,
@@ -77,7 +78,7 @@ func (r repo) PostPerson(ctx *gin.Context) {
 		`INSERT INTO Persons(
 			fornavn,
 			etternavn)
-			VALUES($1, $2) RETURNING userId`,
+			VALUES($1, $2) RETURNING bruker_id`,
 		&person.Fornavn,
 		&person.Etternavn,
 	).Scan(&userId); err != nil {
@@ -88,7 +89,58 @@ func (r repo) PostPerson(ctx *gin.Context) {
 	ctx.JSON(200, userId)
 }
 
-func (r repo) UpdatePerson(ctx *gin.Context) {}
+func (r repo) UpdatePerson(ctx *gin.Context) {
+	var person Person
+	err := ctx.BindJSON(&person)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
+	if person.UserId == nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "brukerid må informeres"})
+		return
+	}
+
+	errMsg := ""
+	if !IsValidName(person.Fornavn) {
+		errMsg = "Ny fornavn er ikke gyldig\n"
+	}
+
+	if !IsValidName(person.Etternavn) {
+		errMsg = "Ny etternavn er ikke gyldig"
+	}
+
+	if errMsg != "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": errMsg})
+		return
+	}
+
+	res, err := r.db.Exec(
+		`UPDATE Person 
+		SET 
+			fornavn = $1, 
+			etternavn = $2
+		WHERE bruker_id = $3`,
+		person.Fornavn, person.Etternavn, *person.UserId,
+	)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+	if rowsAffected == 0 {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": fmt.Sprintf("Kunne ikke finne bruker %d", *person.UserId)})
+		return
+	}
+
+	ctx.JSON(200, rowsAffected)
+}
 
 func (r repo) DeletePerson(ctx *gin.Context) {}
 

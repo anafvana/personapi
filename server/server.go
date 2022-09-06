@@ -9,20 +9,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
-
 type repo struct {
-	db   *sql.DB
+	db *sql.DB
 }
-
-
 
 func startDB() *sql.DB {
 	const (
-		host   = "localhost"
-		port   = 5432
+		host     = "localhost"
+		port     = 5432
 		username = "user123"
-		passwd = "password123"
-		dbname = "persondb"
+		passwd   = "password123"
+		dbname   = "persondb"
 	)
 
 	params := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, username, passwd, dbname)
@@ -33,7 +30,6 @@ func startDB() *sql.DB {
 
 	return db
 }
-
 
 func setRouter(r repo) *gin.Engine {
 	router := gin.Default()
@@ -49,7 +45,7 @@ func setRouter(r repo) *gin.Engine {
 	router.GET("/syllables/:id/etternavn", r.GetSyllablesEtternavn)
 	router.GET("/syllables/:id", r.GetSyllables)
 	router.POST("/person", r.PostPerson)
-	router.PUT("/person/:id", r.UpdatePerson)
+	router.PUT("/person", r.UpdatePerson)
 	router.DELETE("/person/:id", r.DeletePerson)
 
 	router.NoRoute(func(ctx *gin.Context) { ctx.JSON(http.StatusNotFound, gin.H{}) })
@@ -60,7 +56,7 @@ func setRouter(r repo) *gin.Engine {
 func Start() {
 	port := "8080"
 
-	r := repo {
+	r := repo{
 		db: startDB(),
 	}
 	defer r.db.Close()
