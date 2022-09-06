@@ -36,7 +36,7 @@ func (r repo) GetPerson(ctx *gin.Context) {
 	}
 
 	var person Person
-	row := r.db.QueryRow(`SELECT * FROM Persons WHERE bruker_id = $1`, id)
+	row := r.db.QueryRow(`SELECT * FROM Person WHERE bruker_id = $1`, id)
 	if err := row.Scan(
 		&person.UserId,
 		&person.Fornavn,
@@ -75,7 +75,7 @@ func (r repo) PostPerson(ctx *gin.Context) {
 
 	var userId int
 	if err = r.db.QueryRow(
-		`INSERT INTO Persons(
+		`INSERT INTO Person (
 			fornavn,
 			etternavn)
 			VALUES($1, $2) RETURNING bruker_id`,
@@ -142,7 +142,36 @@ func (r repo) UpdatePerson(ctx *gin.Context) {
 	ctx.JSON(200, rowsAffected)
 }
 
-func (r repo) DeletePerson(ctx *gin.Context) {}
+func (r repo) DeletePerson(ctx *gin.Context) {
+	// Retrieve :id parameter
+	id := ctx.Param("id")
+
+	// Ensure :id is convertible to int
+	_, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
+	res, err := r.db.Exec(`DELETE FROM Person WHERE bruker_id = $1`, id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
+	if rowsAffected == 0 {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": fmt.Sprintf("Kunne ikke finne bruker %s", id)})
+		return
+	}
+
+	ctx.JSON(200, rowsAffected)
+}
 
 func (r repo) GetPalindrome(ctx *gin.Context) {}
 
