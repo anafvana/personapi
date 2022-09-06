@@ -39,6 +39,8 @@ func setRouter(r repo) *gin.Engine {
 	router := gin.Default()
 	router.RedirectTrailingSlash = true
 
+	// router.SetTrustedProxies([]string{"localhost:3000", "159.223.16.218"})
+
 	router.GET("/person/:id", r.GetPerson)
 	router.GET("/palindrome/:id/fornavn", r.GetPalindromeFornavn)
 	router.GET("/palindrome/:id/eternavn", r.GetPalindromeEtternavn)
