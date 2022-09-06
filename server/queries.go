@@ -15,7 +15,7 @@ type Person struct {
 	Etternavn 	string 	`json:"etternavn"`
 }
 
-func IsValidName(name string) bool{
+func IsValidName(name string) bool {
 	var validChars = regexp.MustCompile(`^([\p{L}\p{M}* '’])+$`)
 	if found := validChars.FindAllString(name, -1); found == nil || len(found) > 1 {
 		return false
