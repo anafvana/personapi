@@ -211,9 +211,52 @@ func (r repo) GetPalindromeEtternavn(ctx *gin.Context) {
 }
 
 func (r repo) GetSyllables(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
 
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	syllables, status, err := CountSyllables(fmt.Sprintf("%s %s", person.Fornavn, person.Etternavn))
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	ctx.JSON(200, syllables)
 }
 
-func (r repo) GetSyllablesFornavn(ctx *gin.Context) {}
+func (r repo) GetSyllablesFornavn(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
 
-func (r repo) GetSyllablesEtternavn(ctx *gin.Context) {}
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	syllables, status, err := CountSyllables(person.Fornavn)
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	ctx.JSON(200, syllables)
+}
+
+func (r repo) GetSyllablesEtternavn(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	syllables, status, err := CountSyllables(person.Etternavn)
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	ctx.JSON(200, syllables)
+}
