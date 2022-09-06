@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,34 +19,63 @@ type Person struct {
 }
 
 func IsValidName(name string) bool {
-	var validChars = regexp.MustCompile(`^([\p{L}\p{M}* '’])+$`)
-	if found := validChars.FindAllString(name, -1); found == nil || len(found) > 1 {
+	var re = regexp.MustCompile(`^([\p{L}\p{M}* '’])+$`)
+	if found := re.FindAllString(name, -1); found == nil || len(found) > 1 {
 		return false
 	}
 	return true
 }
 
-func (r repo) GetPerson(ctx *gin.Context) {
+func IsPalindrome(word string) bool {
+	re := regexp.MustCompile("[’' ]+")
+	stripped := re.ReplaceAllString(strings.ToLower(word), "")
+	bytes := []byte(stripped)
+	runes := []rune{}
+
+	for utf8.RuneCount(bytes) > 0 {
+		r, size := utf8.DecodeRune(bytes)
+		runes = append(runes, r)
+		bytes = bytes[size:]
+	}
+
+	wLength := len(runes)
+	for i := 0; i < wLength/2; i++ {
+		if runes[i] != runes[wLength-1-i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (r repo) fetchPerson(ctx *gin.Context) (person Person, status int, err error) {
 	// Retrieve :id parameter
 	id := ctx.Param("id")
 
 	// Ensure :id is convertible to int
-	_, err := strconv.Atoi(id)
+	_, err = strconv.Atoi(id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
 
-	var person Person
 	row := r.db.QueryRow(`SELECT * FROM Person WHERE bruker_id = $1`, id)
-	if err := row.Scan(
+	if err = row.Scan(
 		&person.UserId,
 		&person.Fornavn,
 		&person.Etternavn); err != nil && err != sql.ErrNoRows {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
-		return
+		return person, http.StatusInternalServerError, err
 	} else if err == sql.ErrNoRows {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": err.Error()})
+		return person, http.StatusNotFound, err
+	}
+	return person, http.StatusOK, nil
+}
+
+func (r repo) GetPerson(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
 		return
 	}
 
@@ -173,11 +204,44 @@ func (r repo) DeletePerson(ctx *gin.Context) {
 	ctx.JSON(200, rowsAffected)
 }
 
-func (r repo) GetPalindrome(ctx *gin.Context) {}
+func (r repo) GetPalindrome(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
 
-func (r repo) GetPalindromeFornavn(ctx *gin.Context) {}
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
 
-func (r repo) GetPalindromeEtternavn(ctx *gin.Context) {}
+	palindrome := IsPalindrome(person.Fornavn + person.Etternavn)
+
+	ctx.JSON(200, palindrome)
+}
+
+func (r repo) GetPalindromeFornavn(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	palindrome := IsPalindrome(person.Fornavn)
+
+	ctx.JSON(200, palindrome)
+}
+
+func (r repo) GetPalindromeEtternavn(ctx *gin.Context) {
+	person, status, err := r.fetchPerson(ctx)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(status, gin.H{"err": err.Error()})
+		return
+	}
+
+	palindrome := IsPalindrome(person.Etternavn)
+
+	ctx.JSON(200, palindrome)
+}
 
 func (r repo) GetSyllables(ctx *gin.Context) {}
 
