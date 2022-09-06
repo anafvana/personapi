@@ -10,9 +10,9 @@ import (
 )
 
 type Person struct {
-	UserId 		int 	`json:"brukerid,omitempty"`
-	Fornavn 	string 	`json:"fornavn"`
-	Etternavn 	string 	`json:"etternavn"`
+	UserId    int    `json:"brukerid,omitempty"`
+	Fornavn   string `json:"fornavn"`
+	Etternavn string `json:"etternavn"`
 }
 
 func IsValidName(name string) bool {
@@ -26,7 +26,7 @@ func IsValidName(name string) bool {
 func (r repo) GetPerson(ctx *gin.Context) {
 	// Retrieve :id parameter
 	id := ctx.Param("id")
-	
+
 	// Ensure :id is convertible to int
 	_, err := strconv.Atoi(id)
 	if err != nil {
@@ -35,7 +35,7 @@ func (r repo) GetPerson(ctx *gin.Context) {
 	}
 
 	var person Person
-	row := r.db.QueryRow(`SELECT * FROM Applications WHERE userid = $1`, id)
+	row := r.db.QueryRow(`SELECT * FROM Persons WHERE userid = $1`, id)
 	if err := row.Scan(
 		&person.UserId,
 		&person.Fornavn,
@@ -58,6 +58,34 @@ func (r repo) PostPerson(ctx *gin.Context) {
 		return
 	}
 
+	errMsg := ""
+	if !IsValidName(person.Fornavn) {
+		errMsg = "Fornavn er ikke gyldig\n"
+	}
+
+	if !IsValidName(person.Etternavn) {
+		errMsg = "Etternavn er ikke gyldig"
+	}
+
+	if errMsg != "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": errMsg})
+		return
+	}
+
+	var userId int
+	if err = r.db.QueryRow(
+		`INSERT INTO Persons(
+			fornavn,
+			etternavn)
+			VALUES($1, $2) RETURNING userId`,
+		&person.Fornavn,
+		&person.Etternavn,
+	).Scan(&userId); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		return
+	}
+
+	ctx.JSON(200, userId)
 }
 
 func (r repo) UpdatePerson(ctx *gin.Context) {}
