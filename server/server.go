@@ -15,14 +15,16 @@ type repo struct {
 
 func startDB() *sql.DB {
 	const (
-		host     = "localhost"
+		host     = "personapi_postgres"
 		port     = 5432
 		username = "user123"
 		passwd   = "password123"
-		dbname   = "persondb"
+		dbname   = "personapi"
 	)
 
-	params := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, username, passwd, dbname)
+	// params := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, username, passwd, dbname)
+	params := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", username, passwd, host, port, dbname)
+
 	db, err := sql.Open("postgres", params)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot open database. \nERROR: %s", err))
