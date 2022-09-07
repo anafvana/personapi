@@ -57,14 +57,8 @@ func (r repo) PostPerson(ctx *gin.Context) {
 		return
 	}
 
-	errMsg := ""
-	if !IsValidName(person.Fornavn) {
-		errMsg = "Fornavn er ikke gyldig\n"
-	}
-
-	if !IsValidName(person.Etternavn) {
-		errMsg = "Etternavn er ikke gyldig"
-	}
+	errMsg := IsValidName(person.Fornavn, "fornavn")
+	errMsg += IsValidName(person.Etternavn, "etternavn")
 
 	if errMsg != "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": errMsg})
@@ -100,14 +94,8 @@ func (r repo) UpdatePerson(ctx *gin.Context) {
 		return
 	}
 
-	errMsg := ""
-	if !IsValidName(person.Fornavn) {
-		errMsg = "Ny fornavn er ikke gyldig\n"
-	}
-
-	if !IsValidName(person.Etternavn) {
-		errMsg = "Ny etternavn er ikke gyldig"
-	}
+	errMsg := IsValidName(person.Fornavn, "fornavn")
+	errMsg += IsValidName(person.Etternavn, "etternavn")
 
 	if errMsg != "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": errMsg})

@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -10,12 +11,17 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
-func IsValidName(name string) bool {
-	var re = regexp.MustCompile(`^([\p{L}\p{M}* '’])+$`)
-	if found := re.FindAllString(name, -1); found == nil || len(found) > 1 {
-		return false
+func IsValidName(name string, whatis string) (errMsg string) {
+	name = strings.TrimSpace(name)
+	if len(name) < 1 {
+		return fmt.Sprintf("%s er tom\n", whatis)
 	}
-	return true
+
+	re := regexp.MustCompile(`^([\p{L}\p{M}* '’])+$`)
+	if found := re.FindAllString(name, -1); found == nil || len(found) > 1 {
+		return fmt.Sprintf("%s har ugyldige karakterer\n", whatis)
+	}
+	return ""
 }
 
 func IsPalindrome(word string) bool {

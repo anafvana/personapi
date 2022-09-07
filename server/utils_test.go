@@ -10,7 +10,7 @@ func TestIsValidName(t *testing.T) {
 	validNames := []string{"English", "Simplified English", "Português Brasileiro", "Français", "Español", "D'Italiano", "L’étoile", "L’ étoile", "van der Dutch", "русские", "汉语", "漢語", "中文", "日本国"}
 
 	for i, val := range validNames {
-		if res := server.IsValidName(validNames[i]); res != true {
+		if res := server.IsValidName(validNames[i], "test"); res != "" {
 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected true, got %v", i, val, res))
 			t.Fail()
 		}
@@ -19,7 +19,7 @@ func TestIsValidName(t *testing.T) {
 	invalidNames := []string{"日1本国", "Norsk0 Dansk", "0", "Deutsch."}
 
 	for i, val := range invalidNames {
-		if res := server.IsValidName(invalidNames[i]); res != false {
+		if res := server.IsValidName(invalidNames[i], "test"); res == "" {
 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected false, got %v", i, val, res))
 			t.Fail()
 		}
@@ -29,7 +29,7 @@ func TestIsValidName(t *testing.T) {
 }
 
 func TestIsPalindrome(t *testing.T) {
-	palindromes := []string{"Ana", "D’anad", "L’ ol", "van Nav", "naan", "汉语汉", "руссур", "Руссур", "Øyø"}
+	palindromes := []string{"Ana", "D’anad", "L’ ol", "van Nav", "naan", "汉语汉", "руссур", "Руссур", "Øyø", "", "    ", "	"}
 
 	for i, val := range palindromes {
 		if res := server.IsPalindrome(palindromes[i]); res != true {
