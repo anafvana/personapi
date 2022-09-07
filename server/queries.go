@@ -33,7 +33,7 @@ func (r repo) fetchPerson(ctx *gin.Context) (person Person, status int, err erro
 		&person.Etternavn); err != nil && err != sql.ErrNoRows {
 		return person, http.StatusInternalServerError, err
 	} else if err == sql.ErrNoRows {
-		return person, http.StatusNotFound, err
+		return person, http.StatusNotFound, fmt.Errorf("kunne ikke finne bruker %s", id)
 	}
 	return person, http.StatusOK, nil
 }
@@ -121,7 +121,7 @@ func (r repo) UpdatePerson(ctx *gin.Context) {
 		return
 	}
 	if rowsAffected == 0 {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": fmt.Sprintf("Kunne ikke finne bruker %d", *person.UserId)})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": fmt.Sprintf("kunne ikke finne bruker %d", *person.UserId)})
 		return
 	}
 
@@ -152,7 +152,7 @@ func (r repo) DeletePerson(ctx *gin.Context) {
 	}
 
 	if rowsAffected == 0 {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": fmt.Sprintf("Kunne ikke finne bruker %s", id)})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"err": fmt.Sprintf("kunne ikke finne bruker %s", id)})
 		return
 	}
 

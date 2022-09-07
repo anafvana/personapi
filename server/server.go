@@ -27,7 +27,7 @@ func startDB() *sql.DB {
 
 	db, err := sql.Open("postgres", params)
 	if err != nil {
-		panic(fmt.Sprintf("Cannot open database. \nERROR: %s", err))
+		panic(fmt.Sprintf("Cannot open database. ERROR: %s", err))
 	}
 
 	return db
@@ -40,12 +40,12 @@ func setRouter(r repo) *gin.Engine {
 	// router.SetTrustedProxies([]string{"localhost:3000", "159.223.16.218"})
 
 	router.GET("/person/:id", r.GetPerson)
-	router.GET("/palindrome/:id/fornavn", r.GetPalindromeFornavn)
-	router.GET("/palindrome/:id/eternavn", r.GetPalindromeEtternavn)
-	router.GET("/palindrome/:id", r.GetPalindrome)
-	router.GET("/syllables/:id/fornavn", r.GetSyllablesFornavn)
-	router.GET("/syllables/:id/etternavn", r.GetSyllablesEtternavn)
-	router.GET("/syllables/:id", r.GetSyllables)
+	router.GET("/palindrom/:id/fornavn", r.GetPalindromeFornavn)
+	router.GET("/palindrom/:id/etternavn", r.GetPalindromeEtternavn)
+	router.GET("/palindrom/:id", r.GetPalindrome)
+	router.GET("/stavelser/:id/fornavn", r.GetSyllablesFornavn)
+	router.GET("/stavelser/:id/etternavn", r.GetSyllablesEtternavn)
+	router.GET("/stavelser/:id", r.GetSyllables)
 	router.POST("/person", r.PostPerson)
 	router.PUT("/person", r.UpdatePerson)
 	router.DELETE("/person/:id", r.DeletePerson)

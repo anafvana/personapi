@@ -14,12 +14,12 @@ import (
 func IsValidName(name string, whatis string) (errMsg string) {
 	name = strings.TrimSpace(name)
 	if len(name) < 1 {
-		return fmt.Sprintf("%s er tom\n", whatis)
+		return fmt.Sprintf("%s er tom. ", whatis)
 	}
 
 	re := regexp.MustCompile(`^([\p{L}\p{M}* '’])+$`)
 	if found := re.FindAllString(name, -1); found == nil || len(found) > 1 {
-		return fmt.Sprintf("%s har ugyldige karakterer\n", whatis)
+		return fmt.Sprintf("%s har ugyldige karakterer. ", whatis)
 	}
 	return ""
 }
