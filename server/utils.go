@@ -63,7 +63,7 @@ func CountSyllables(name string) (syllables int, status int, err error) {
 
 	reNorsk := regexp.MustCompile(`[^a-zæøå '’]`)
 	if found := reNorsk.FindAllString(name, -1); found != nil || len(found) > 0 {
-		return syllables, http.StatusNotImplemented, errors.New("Kan ikke telle tale i ikke-norsk ord")
+		return syllables, http.StatusNotImplemented, errors.New("kan ikke telle tale i ikke-norsk ord")
 	}
 
 	reSterke := regexp2.MustCompile(`(?<![uiy])[aeoåøæ](?![uiy])`, regexp2.None)
