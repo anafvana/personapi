@@ -88,3 +88,84 @@ func TestSyllables(t *testing.T) {
 
 	fmt.Printf("Finished countSyllables' %d tests\n", len(words)+len(invalid))
 }
+
+// func TestIsPalindromeOld(t *testing.T) {
+// 	palindromes := []string{"Ana", "D’anad", "L’ ol", "van Nav", "naan", "汉语汉", "руссур", "Руссур", "Øyø", "", "    ", "	"}
+
+// 	for i, val := range palindromes {
+// 		if res := server.IsPalindromeOld(palindromes[i]); res != true {
+// 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected true, got %v", i, val, res))
+// 			t.Fail()
+// 		}
+// 	}
+
+// 	notPalindromes := []string{"English", "русские", "汉语", "漢語", "中文", "日本国", "Aná", "Naán", "Oyø", "0yø"}
+
+// 	for i, val := range notPalindromes {
+// 		if res := server.IsPalindromeOld(notPalindromes[i]); res != false {
+// 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected false, got %v", i, val, res))
+// 			t.Fail()
+// 		}
+// 	}
+
+// 	fmt.Printf("Finished isPalindrome's %d tests\n", len(palindromes)+len(notPalindromes))
+// }
+
+// func TimeTestIsPalindromeOld(t *testing.T) {
+// 	p1 := strings.Repeat("汉", 100000) + " Рpр" + strings.Repeat("汉", 100000)
+// 	p2 := "D’" + strings.Repeat("у", 100000) + "a" + strings.Repeat("у", 100000) + "d"
+// 	palindromes := []string{p1, p2}
+
+// 	n1 := strings.Repeat("汉", 100000) + " Рp" + strings.Repeat("汉", 100000)
+// 	n2 := "D’" + strings.Repeat("у", 100000) + "ya" + strings.Repeat("у", 100000) + "d"
+// 	notPalindromes := []string{n1, n2}
+
+// 	start := time.Now()
+// 	for i, val := range palindromes {
+// 		if res := server.IsPalindromeOld(palindromes[i]); res != true {
+// 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected true, got %v", i, val, res))
+// 			t.Fail()
+// 		}
+// 	}
+
+// 	for i, val := range notPalindromes {
+// 		if res := server.IsPalindromeOld(notPalindromes[i]); res != false {
+// 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected false, got %v", i, val, res))
+// 			t.Fail()
+// 		}
+// 	}
+
+// 	fmt.Println(time.Since(start))
+
+// 	fmt.Printf("Finished isPalindromeOld's %d time tests\n", len(palindromes)+len(notPalindromes))
+// }
+
+// func TimeTestIsPalindrome(t *testing.T) {
+// 	p1 := strings.Repeat("汉", 100000) + " Рpр" + strings.Repeat("汉", 100000)
+// 	p2 := "D’" + strings.Repeat("у", 100000) + "a" + strings.Repeat("у", 100000) + "d"
+// 	palindromes := []string{p1, p2}
+
+// 	n1 := strings.Repeat("汉", 100000) + " Рp" + strings.Repeat("汉", 100000)
+// 	n2 := "D’" + strings.Repeat("у", 100000) + "ya" + strings.Repeat("у", 100000) + "d"
+// 	notPalindromes := []string{n1, n2}
+
+// 	start := time.Now()
+
+// 	for i, val := range palindromes {
+// 		if res := server.IsPalindrome(palindromes[i]); res != true {
+// 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected true, got %v", i, val, res))
+// 			t.Fail()
+// 		}
+// 	}
+
+// 	for i, val := range notPalindromes {
+// 		if res := server.IsPalindrome(notPalindromes[i]); res != false {
+// 			t.Logf(fmt.Sprintf("Failed on item #%d %s ; expected false, got %v", i, val, res))
+// 			t.Fail()
+// 		}
+// 	}
+
+// 	fmt.Println(time.Since(start))
+
+// 	fmt.Printf("Finished isPalindrome's %d tests\n", len(palindromes)+len(notPalindromes))
+// }

@@ -24,7 +24,7 @@ func IsValidName(name string, whatis string) (errMsg string) {
 	return ""
 }
 
-func IsPalindrome(word string) bool {
+func IsPalindromeOld(word string) bool {
 	re := regexp.MustCompile("[’' ]+")
 	stripped := re.ReplaceAllString(strings.ToLower(word), "")
 	bytes := []byte(stripped)
@@ -41,6 +41,25 @@ func IsPalindrome(word string) bool {
 		if runes[i] != runes[wLength-1-i] {
 			return false
 		}
+	}
+
+	return true
+}
+
+func IsPalindrome(word string) bool {
+	re := regexp.MustCompile("[’' ]+")
+	stripped := re.ReplaceAllString(strings.ToLower(word), "")
+	bytes := []byte(stripped)
+
+	for utf8.RuneCount(bytes) > 1 {
+		f, fSize := utf8.DecodeRune(bytes)
+		l, lSize := utf8.DecodeLastRune(bytes)
+
+		if f != l {
+			return false
+		}
+
+		bytes = bytes[fSize:(len(bytes) - lSize)]
 	}
 
 	return true
